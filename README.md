@@ -2,8 +2,8 @@
 
 InferESG's mission is to augment people working in the ESG (Environment, Societal and Governance) field. Helping them analyse ESG related documents and data, and find the important needles in massive haystacks of potential greenwashing. We want to build something that can:
 
-🔗 Ingest data about you from various sources (with your permission of course)  
-💡 Have deep science based conversations without having to answer lots of questions - it will already infer your needs, make personalised recommendations and remember relevant details.  
+🔗 Ingest data via CSV upload 
+💡 Have deep science based conversations - it will already infer your needs, make contextual recommendations and remember relevant details.  
 
 We aim to be able to answer complex questions that require a deep understanding of someone to effectively answer, such as:
 
