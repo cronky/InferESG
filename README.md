@@ -1,20 +1,18 @@
-# InferGPT: your local personalised AI agent
+# InferESG: Applying InferLLM/GPT to the ESG domain.
 
-InferGPT's mission is to be an AI that knows you better than your best friend. A system that personalises to who you are and what you care about. We want to build something that can:
+InferESG's mission is to augment people working in the ESG (Environment, Societal and Governance) field. Helping them analyse ESG related documents and data, and find the important needles in massive haystacks of potential greenwashing. We want to build something that can:
 
 🔗 Ingest data about you from various sources (with your permission of course)  
-💡 Have deep and personal conversations without having to answer lots of questions - it will already infer your needs, make personalised recommendations and remember all your conversations.  
-🎯 Help you set and keep track of goals.  
-🏗️ Carry out tasks: this is an agent after all - it will go away and action stuff for you!  
-🔮 Predict what you need before you need it!
+💡 Have deep science based conversations without having to answer lots of questions - it will already infer your needs, make personalised recommendations and remember relevant details.  
 
 We aim to be able to answer complex questions that require a deep understanding of someone to effectively answer, such as:
 
-1. How can i be better with my finances?
-2. I'm trying to lose weight but its not working, why?
-3. I'm learning to code, can you create a tailored learning plan?
+1. Does this document look like it contains Greenwashing?
+2. Which of the companies in this fund should I prioritise deep analysis on?
+3. I'm learning about ESG - can you help me understand this area better?
 
-## Roadmap & Docs
+## InferGPT Roadmap & Docs
+InferESG is based on InferGPT/LLM - more details below:
 
 Want more context about how it works, our roadmap and documentation? Check out the [wiki](https://github.com/WaitThatShouldntWork/InferGPT/wiki)
 
