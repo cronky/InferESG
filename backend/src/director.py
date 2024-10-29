@@ -1,6 +1,7 @@
 import json
 import logging
 from src.utils import clear_scratchpad, update_scratchpad, get_scratchpad
+from src.session import update_session_chat
 from src.agents import get_intent_agent, get_answer_agent
 from src.prompts import PromptEngine
 from src.supervisors import solve_all
@@ -16,6 +17,7 @@ director_prompt = engine.load_prompt("director")
 async def question(question: str) -> str:
     intent = await get_intent_agent().invoke(question)
     intent_json = json.loads(intent)
+    update_session_chat(role="user", content=question)
     logger.info(f"Intent determined: {intent}")
 
     try:
@@ -34,6 +36,7 @@ async def question(question: str) -> str:
             return ""
 
     final_answer = await get_answer_agent().invoke(question)
+    update_session_chat(role="system", content=final_answer)
     logger.info(f"final answer: {final_answer}")
 
     clear_scratchpad()
