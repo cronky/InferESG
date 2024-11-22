@@ -15,14 +15,12 @@ engine = PromptEngine()
 
 async def search_urls(search_query, num_results=10) -> str:
     logger.info(f"Searching the web for: {search_query}")
-    urls = []
     try:
-        for url in search(search_query, num_results=num_results):
-            urls.append(url)
+        https_urls = [str(url) for url in search(search_query, num_results=num_results) if str(url).startswith("https")]
         return json.dumps(
             {
                 "status": "success",
-                "urls": urls,
+                "urls": https_urls,
                 "error": None,
             }
         )
@@ -83,9 +81,9 @@ async def create_search_term(search_query, llm, model) -> str:
             }
         )
 
-async def answer_user_ques(search_query, llm, model) -> str:
+async def answer_user_question(search_query, llm, model) -> str:
     try:
-        summariser_prompt = engine.load_prompt("answer-user-ques", question=search_query)
+        summariser_prompt = engine.load_prompt("answer-user-question", question=search_query)
         response = await llm.chat(model, summariser_prompt, "", return_json=True)
         return json.dumps(
             {
