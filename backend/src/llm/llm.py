@@ -10,7 +10,7 @@ count_calls_of_functions = ["chat", "chat_with_file"]
 
 @dataclass
 class LLMFile(ABC):
-    file_name: str
+    filename: str
     file: PathLike[str] | bytes
 
 
@@ -53,4 +53,14 @@ class LLM(ABC, metaclass=LLMMeta):
         user_prompt: str,
         files: list[LLMFile]
     ) -> Coroutine:
+        pass
+
+
+class LLMFileUploadManager(ABC):
+    @abstractmethod
+    async def upload_files(self, files: list[LLMFile]) -> list[str]:
+        pass
+
+    @abstractmethod
+    async def delete_all_files(self):
         pass
