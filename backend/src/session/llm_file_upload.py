@@ -23,7 +23,7 @@ def get_all_files() -> list[dict[str, str]]:
     return []
 
 
-def get_llm_file_upload(filename: str) -> str | None:
+def get_llm_file_upload_id(filename: str) -> str | None:
     files = get_all_files()
     for file in files:
         if file["filename"] == filename:
@@ -37,3 +37,6 @@ def add_llm_file_upload(file_id: str, filename: str):
         files = []
     files.append({"file_id": file_id, "filename": filename})
     redis_client.set(UPLOAD_SESSION_KEY, json.dumps(files))
+
+def reset_llm_file_uploads():
+    redis_client.set(UPLOAD_SESSION_KEY, json.dumps([]))

@@ -20,16 +20,16 @@ REPORT_KEY_PREFIX = "report_"
 
 
 class FileUploadMeta(TypedDict):
-    uploadId: str
+    id: str
     filename: str
+    upload_id: Optional[str]
 
 
 class FileUpload(TypedDict):
-    uploadId: str
-    content: str
+    id: str
     filename: str
-    contentType: Optional[str]
-    size: Optional[int]
+    upload_id: Optional[str]
+    content: Optional[str]
 
 
 class ReportResponse(TypedDict):
@@ -51,8 +51,8 @@ def _get_key(key):
     return None
 
 
-def get_session_file_upload(upload_id) -> FileUpload | None:
-    return _get_key(UPLOADS_KEY_PREFIX + upload_id)
+def get_session_file_upload(id) -> FileUpload | None:
+    return _get_key(UPLOADS_KEY_PREFIX + id)
 
 
 def update_session_file_uploads(file_upload: FileUpload):
@@ -61,9 +61,33 @@ def update_session_file_uploads(file_upload: FileUpload):
         # initialise the session object
         set_session(UPLOADS_META_SESSION_KEY, file_uploads_meta_session)
 
-    file_uploads_meta_session.append({"uploadId": file_upload["uploadId"], "filename": file_upload["filename"]})
-    redis_client.set(UPLOADS_KEY_PREFIX + file_upload["uploadId"], json.dumps(file_upload))
+    file_uploads_meta_session.append({"id": file_upload["id"], "filename": file_upload["filename"]})
+    redis_client.set(UPLOADS_KEY_PREFIX + file_upload["id"], json.dumps(file_upload))
 
+def get_file_meta_for_filename(filename: str) -> FileUploadMeta | None:
+    files = get_session_file_uploads_meta() or []
+    for file in files:
+        if file["filename"] == filename:
+            return file
+
+def get_file_content_for_filename(filename: str) -> str | None:
+    file_meta = get_file_meta_for_filename(filename)
+    if file_meta:
+        file = get_session_file_upload(file_meta["id"])
+        return file["content"] if file else None
+    return None
+
+def set_file_content_for_filename(filename: str, content:str):
+    file_meta = get_file_meta_for_filename(filename)
+    if file_meta:
+        file = get_session_file_upload(file_meta["id"])
+        if file:
+            file["content"] = content
+            redis_client.set(UPLOADS_KEY_PREFIX + file_meta["id"], json.dumps(file))
+        else:
+            logger.warning(f"set file content for missing id {id}")
+    else:
+        logger.warning(f"set file content for missing filename {filename}")
 
 def clear_session_file_uploads():
     logger.info("Clearing file uploads and reports from session")
@@ -72,8 +96,8 @@ def clear_session_file_uploads():
 
     keys = []
     for meta in meta_list:
-        keys.append(UPLOADS_KEY_PREFIX + meta["uploadId"])
-        keys.append(REPORT_KEY_PREFIX + meta["uploadId"])
+        keys.append(UPLOADS_KEY_PREFIX + meta["id"])
+        keys.append(REPORT_KEY_PREFIX + meta["id"])
 
     if keys:
         logger.info(f"Deleting keys {keys}")

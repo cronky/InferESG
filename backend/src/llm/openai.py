@@ -6,8 +6,9 @@ from src.utils import Config
 from src.llm.llm import LLM, LLMFile, LLMFileUploadManager
 from src.session.llm_file_upload import (
     add_llm_file_upload,
-    get_llm_file_upload,
-    get_all_files
+    get_all_files,
+    get_llm_file_upload_id,
+    reset_llm_file_uploads
 )
 from openai import NOT_GIVEN, AsyncOpenAI, OpenAIError
 from openai.types.beta.threads import Text, TextContentBlock
@@ -64,6 +65,7 @@ class OpenAI(LLM):
             name="ESG Analyst",
             instructions=system_prompt,
             model=model,
+            temperature=0,
             tools=[{"type": "file_search"}],
             response_format={"type": "json_object"} if return_json else NOT_GIVEN,
         )
@@ -78,7 +80,12 @@ class OpenAI(LLM):
             ]
         )
 
-        run = await client.beta.threads.runs.create_and_poll(thread_id=thread.id, assistant_id=file_assistant.id)
+        run = await client.beta.threads.runs.create_and_poll(
+            thread_id=thread.id,
+            assistant_id=file_assistant.id,
+            temperature=0,
+            response_format={"type": "json_object"} if return_json else NOT_GIVEN,
+        )
 
         messages = await client.beta.threads.messages.list(thread_id=thread.id, run_id=run.id)
 
@@ -86,6 +93,8 @@ class OpenAI(LLM):
             message = remove_citations(messages.data[0].content[0].text)
         else:
             message = messages.data[0].content[0].to_json()
+
+        await client.beta.threads.delete(thread.id)
 
         logger.info(f"OpenAI response: {message}")
         return message
@@ -99,7 +108,7 @@ class OpenAILLMFileUploadManager(LLMFileUploadManager):
         files_to_upload = []
         start_time = time.time()
         for file in files:
-            file_id = get_llm_file_upload(file.filename)
+            file_id = get_llm_file_upload_id(file.filename)
             if not file_id:
                 logger.info(f"Open AI: Preparing to upload '{file.filename}'")
                 file = (file.filename, file.file) if isinstance(file.file, bytes) else file.file
@@ -126,6 +135,8 @@ class OpenAILLMFileUploadManager(LLMFileUploadManager):
             logger.info(f"Open AI: deleting files {files}")
             delete_tasks = [client.files.delete(file_id=file["file_id"]) for file in files]
             await asyncio.gather(*delete_tasks)
+            reset_llm_file_uploads()
             logger.info("Open AI: Files deleted")
         except OpenAIError:
             logger.info("OpenAI not configured")
+

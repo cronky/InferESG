@@ -56,18 +56,18 @@ def test_get_session_file_uploads_meta_empty(mocker, mock_request_context):
 def test_set_session(mocker, mock_redis, mock_request_context):
     mocker.patch("src.session.redis_session_middleware.request_context", mock_request_context)
     mocker.patch("src.session.file_uploads.redis_client", mock_redis)
-    file = FileUpload(contentType="text/plain", size=4, content="test", uploadId="1234", filename="test.txt")
-    file2 = FileUpload(contentType="text/plain", size=5, content="test2", uploadId="12345", filename="test2.txt")
+    file = FileUpload(content="test", id="1234", filename="test.txt", upload_id=None)
+    file2 = FileUpload(content="test2", id="12345", filename="test2.txt", upload_id=None)
 
     update_session_file_uploads(file_upload=file)
 
-    assert get_session_file_uploads_meta() == [{"filename": "test.txt", "uploadId": "1234"}]
+    assert get_session_file_uploads_meta() == [{"filename": "test.txt", "id": "1234"}]
     mock_redis.set.assert_called_with("file_upload_1234", json.dumps(file))
 
     update_session_file_uploads(file_upload=file2)
     assert get_session_file_uploads_meta() == [
-        {"filename": "test.txt", "uploadId": "1234"},
-        {"filename": "test2.txt", "uploadId": "12345"},
+        {"filename": "test.txt", "id": "1234"},
+        {"filename": "test2.txt", "id": "12345"},
     ]
 
     mock_redis.set.assert_called_with("file_upload_12345", json.dumps(file2))
@@ -75,7 +75,7 @@ def test_set_session(mocker, mock_redis, mock_request_context):
 
 def test_get_session_file_upload(mocker, mock_redis):
     mocker.patch("src.session.file_uploads.redis_client", mock_redis)
-    file = FileUpload(contentType="text/plain", size=4, content="test", uploadId="1234", filename="test.txt")
+    file = FileUpload(content="test", id="1234", filename="test.txt", upload_id=None)
     mock_redis.get.return_value = json.dumps(file)
     assert get_session_file_upload("file_upload_1234") == file
 
@@ -84,8 +84,8 @@ def test_clear_session_file_uploads_meta(mocker, mock_redis, mock_request_contex
     mocker.patch("src.session.file_uploads.redis_client", mock_redis)
     mocker.patch("src.session.redis_session_middleware.request_context", mock_request_context)
 
-    file = FileUpload(contentType="text/plain", size=4, content="test", uploadId="1234", filename="test.txt")
-    file2 = FileUpload(contentType="text/plain", size=5, content="test2", uploadId="12345", filename="test2.txt")
+    file = FileUpload(content="test", id="1234", filename="test.txt", upload_id=None)
+    file2 = FileUpload(content="test2", id="12345", filename="test2.txt", upload_id=None)
 
     update_session_file_uploads(file_upload=file)
 
@@ -97,8 +97,8 @@ def test_clear_session_file_uploads_meta(mocker, mock_redis, mock_request_contex
     update_session_file_uploads(file_upload=file)
     update_session_file_uploads(file_upload=file2)
     assert get_session_file_uploads_meta() == [
-        {"filename": "test.txt", "uploadId": "1234"},
-        {"filename": "test2.txt", "uploadId": "12345"},
+        {"filename": "test.txt", "id": "1234"},
+        {"filename": "test2.txt", "id": "12345"},
     ]
 
     clear_session_file_uploads()

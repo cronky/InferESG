@@ -1,7 +1,8 @@
 from fastapi import HTTPException
 from mistralai import Mistral as MistralApi, UserMessage, SystemMessage
 import logging
-from src.utils.file_utils import handle_file_upload
+from src.session.file_uploads import get_file_content_for_filename, set_file_content_for_filename
+from src.utils.file_utils import extract_text
 from src.utils import Config
 from .llm import LLM, LLMFile
 
@@ -40,9 +41,12 @@ class Mistral(LLM):
     ) -> str:
         try:
             for file in files:
-                file = handle_file_upload(file)
-                extracted_content = file["content"]
+                extracted_content = get_file_content_for_filename(file.filename)
+                if not extracted_content:
+                    extracted_content = extract_text(file)
+                    set_file_content_for_filename(file.filename, extracted_content)
                 user_prompt += f"\n\nDocument:\n{extracted_content}"
             return await self.chat(model, system_prompt, user_prompt, return_json)
         except Exception as file_error:
-            raise HTTPException(status_code=500, detail=f"Failed to process files: {str(file_error)}") from file_error
+            logger.exception(file_error)
+            raise HTTPException(status_code=500, detail=f"Failed to process files: {file_error}") from file_error
