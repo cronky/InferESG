@@ -1,10 +1,13 @@
 from contextlib import asynccontextmanager
+import json
 import logging.config
 import os
 from typing import NoReturn
-from fastapi import FastAPI, HTTPException, Response, WebSocket, UploadFile
+import uuid
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Response, WebSocket, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from src.session.llm_file_upload import get_llm_file_upload_id
 from src.utils.scratchpad import ScratchPadMiddleware
 from src.session.chat_response import get_session_chat_response_ids
 from src.chat_storage_service import clear_chat_messages, get_chat_message
@@ -18,6 +21,7 @@ from src.session import RedisSessionMiddleware
 from src.suggestions_generator import generate_suggestions
 from src.utils.file_utils import get_file_upload
 from src.llm.openai import OpenAILLMFileUploadManager
+from src.websockets.connection_manager import Message, MessageTypes
 
 config_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "config.ini"))
 logging.config.fileConfig(fname=config_file_path, disable_existing_loggers=False)
@@ -98,6 +102,8 @@ async def chat(utterance: str):
 async def clear_chat():
     logger.info("Delete the chat session")
     try:
+        cancellation_message = Message(type=MessageTypes.REPORT_CANCELLED, data="Chat session cleared")
+        await connection_manager.broadcast(cancellation_message)
         # clear chatresponses and files first as need session data for keys
         clear_chat_messages(get_session_chat_response_ids())
         clear_session_file_uploads()
@@ -133,17 +139,55 @@ async def suggestions():
 
 
 @app.post("/report")
-async def report(file: UploadFile):
-    logger.info(f"upload file type={file.content_type} name={file.filename} size={file.size}")
+async def report(file: UploadFile, background_tasks: BackgroundTasks):
+    logger.info(f"Uploading file: {file.filename}")
     try:
-        processed_upload = await create_report_from_file(file)
-        return JSONResponse(status_code=200, content=processed_upload)
+        file_contents = await file.read()
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="Filename missing from file upload.")
+
+        existing_id = get_llm_file_upload_id(file.filename)
+        if existing_id:
+            logger.info(f"File {file.filename} already uploaded to OpenAI with id '{existing_id}'")
+
+        file_id = existing_id if existing_id else str(uuid.uuid4())
+        background_tasks.add_task(generate_report, file_contents, file.filename, file_id)
+
+        return JSONResponse(
+            status_code=200,
+            content={"message": "File uploaded successfully", "id": file_id},
+        )
     except HTTPException as he:
         raise he
     except Exception as e:
         logger.exception(e)
         return JSONResponse(status_code=500, content=file_upload_failed_response)
 
+
+async def generate_report(file_contents: bytes, filename: str, file_id: str ):
+    try:
+        logger.info(f"Generating report for file: {filename} with ID: {file_id}")
+        progress_message = Message(type=MessageTypes.REPORT_IN_PROGRESS, data="Report generation started")
+        await connection_manager.broadcast(progress_message)
+
+        report_response = await create_report_from_file(file_contents, filename, file_id)
+
+        complete_message = Message(
+            type=MessageTypes.REPORT_COMPLETE,
+            data=json.dumps(
+                {
+                    "id": file_id,
+                    "filename": report_response["filename"],
+                    "report": report_response["report"],
+                    "answer": report_response["answer"],
+                }
+            ),
+        )
+        await connection_manager.broadcast(complete_message)
+    except Exception as e:
+        logger.exception(f"Error generating report: {e}")
+        error_message = Message(type=MessageTypes.REPORT_FAILED, data="Report generation failed")
+        await connection_manager.broadcast(error_message)
 
 @app.get("/report/{id}")
 def download_report(id: str):

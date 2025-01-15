@@ -1,7 +1,6 @@
 import sys
 import uuid
-from fastapi import UploadFile, HTTPException
-
+from fastapi import HTTPException
 from src.llm.llm import LLMFile
 from src.session.file_uploads import (
     FileUpload,
@@ -14,18 +13,17 @@ from src.agents import get_report_agent, get_materiality_agent
 MAX_FILE_SIZE = 10 * 1024 * 1024
 
 
-async def create_report_from_file(upload: UploadFile) -> ReportResponse:
-    file_stream = await upload.read()
-    if upload.filename is None or upload.filename == "":
-        raise HTTPException(status_code=400, detail="Filename missing from file upload")
+async def create_report_from_file(file_contents: bytes, filename: str | None, file_id:  str ) -> ReportResponse:
+    file_size = sys.getsizeof(file_contents)
 
-    file_size = sys.getsizeof(file_stream)
+    if filename is None or filename == "":
+        raise HTTPException(status_code=400, detail="Filename missing from file upload")
 
     if file_size > MAX_FILE_SIZE:
         raise HTTPException(status_code=413, detail=f"File upload must be less than {MAX_FILE_SIZE} bytes")
 
-    file_id = str(uuid.uuid4())
-    file = LLMFile(filename=upload.filename, file=file_stream)
+
+    file = LLMFile(filename=filename, file=file_contents)
 
     session_file = FileUpload(
         id=file_id,
@@ -45,10 +43,10 @@ async def create_report_from_file(upload: UploadFile) -> ReportResponse:
     report = await report_agent.create_report(file, topics)
 
     report_response = ReportResponse(
-        filename=file.filename,
-        id=file_id,
+        filename=filename,
+        id=str(uuid.uuid4()),
         report=report,
-        answer=create_report_chat_message(file.filename, company_name, topics),
+        answer=create_report_chat_message(filename, company_name, topics),
     )
 
     store_report(report_response)
