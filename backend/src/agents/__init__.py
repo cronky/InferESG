@@ -5,11 +5,10 @@ from src.agents.agent import Agent, ChatAgent, chat_agent
 from src.agents.datastore_agent import DatastoreAgent
 from src.agents.web_agent import WebAgent
 from src.agents.intent_agent import IntentAgent
-from src.agents.tool import utterance_tool, parameterised_tool, Parameter
+from src.agents.tool import tool, Parameter
 from src.agents.validator_agent import ValidatorAgent
 from src.agents.answer_agent import AnswerAgent
 from src.agents.file_agent import FileAgent
-from src.agents.chart_generator_agent import ChartGeneratorAgent
 from src.agents.report_agent import ReportAgent
 from src.agents.materiality_agent import MaterialityAgent
 from src.agents.generalist_agent import GeneralistAgent
@@ -46,7 +45,6 @@ def get_chat_agents() -> List[ChatAgent]:
     return [
         DatastoreAgent(config.datastore_agent_llm, config.datastore_agent_model),
         WebAgent(config.web_agent_llm, config.web_agent_model),
-        ChartGeneratorAgent(config.chart_generator_llm, config.chart_generator_model),
         get_materiality_agent(),
         FileAgent(config.file_agent_llm, config.file_agent_model)
     ]
@@ -64,6 +62,5 @@ __all__ = [
     "get_materiality_agent",
     "get_generalist_agent",
     "Parameter",
-    "utterance_tool",
-    "parameterised_tool"
+    "tool"
 ]

@@ -2,7 +2,7 @@ import logging
 
 from src.agents.agent import ChatAgentSuccess
 from src.utils import get_scratchpad, update_scratchpad
-from src.router import select_agent_for_task
+from src.router import select_tool_for_question
 from src.agents import get_generalist_agent
 
 logger = logging.getLogger(__name__)
@@ -25,23 +25,20 @@ async def solve_questions(questions: list[str]) -> None:
             update_scratchpad(error=str(error))
 
 
-async def solve_question(task, scratchpad) -> ChatAgentSuccess:
-    agent = await select_agent_for_task(task, scratchpad)
+async def solve_question(question, scratchpad) -> ChatAgentSuccess:
     unsuccessful_agents = []
     for attempt in range(number_of_attempts):
+        agent, tool_name, parameters = await select_tool_for_question(question, scratchpad, unsuccessful_agents)
         if agent is None:
-            raise Exception(unsolvable_response if unsuccessful_agents else no_agent_response)
+            break
 
-        logger.info(f"Agent selected: {agent.name}. Task is: {task}")
-        answer = await agent.invoke(task)
+        answer = await agent.invoke(question, tool_name, parameters)
         logger.info(f"Agent answer: {answer} ")
         if isinstance(answer, ChatAgentSuccess):
             return answer
         else:
-            is_final_attempt = attempt >= number_of_attempts - 2
-            if is_final_attempt:
-                agent = get_generalist_agent()
-            elif not answer.retry:
+            if not answer.retry:
                 unsuccessful_agents.append(answer.agent_name)
-                agent = await select_agent_for_task(task, scratchpad, unsuccessful_agents)
-    raise Exception(unsolvable_response)
+
+    logger.info("Defaulting to Generalist Agent")
+    return await get_generalist_agent().generalist_answer(question)

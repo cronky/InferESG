@@ -1,6 +1,5 @@
-from abc import ABC
 from typing import Callable, Coroutine, Any
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass
@@ -8,6 +7,12 @@ class Parameter:
     type: str
     description: str
     required: bool = True
+
+
+class CommonParameters:
+    USER_QUESTION = {
+        "user_question": Parameter("string", "The full question asked by the user.")
+    }
 
 
 ToolAnswerType = str | list[Any] | dict[str, Any]
@@ -28,35 +33,19 @@ ToolAction = Callable[..., Coroutine[Any, Any, ToolActionSuccess | ToolActionFai
 
 
 @dataclass
-class Tool(ABC):
+class Tool:
     name: str
     description: str
     action: ToolAction
+    parameters: dict[str, Parameter]
 
 
-@dataclass
-class UtteranceTool(Tool):
-    """This class represents tools which require utterance only"""
-
-
-@dataclass
-class ParameterisedTool(Tool):
-    parameters: dict[str, Parameter] = field(default_factory=lambda: {})
-
-
-def utterance_tool(name: str, description: str) -> Callable[[ToolAction], UtteranceTool]:
-    def create_tool_from(action: ToolAction) -> UtteranceTool:
-        return UtteranceTool(name, description, action)
-
-    return create_tool_from
-
-
-def parameterised_tool(
+def tool(
     name: str,
     description: str,
     parameters: dict[str, Parameter]
-) -> Callable[[ToolAction], ParameterisedTool]:
-    def create_tool_from(action: ToolAction) -> ParameterisedTool:
-        return ParameterisedTool(name, description, action, parameters)
+) -> Callable[[ToolAction], Tool]:
+    def create_tool_from(action: ToolAction) -> Tool:
+        return Tool(name, description, action, parameters)
 
     return create_tool_from

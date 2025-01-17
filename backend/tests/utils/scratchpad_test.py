@@ -1,3 +1,4 @@
+from unittest.mock import ANY
 from src.utils.scratchpad import clear_scratchpad, get_scratchpad, update_scratchpad
 
 
@@ -9,6 +10,13 @@ def test_scratchpad():
     assert get_scratchpad() == []
     update_scratchpad("ExampleAgent", question, "example result")
     assert get_scratchpad() == [
-        {"agent_name": "ExampleAgent", "question": "example question", "result": "example result", "error": None}
+        {
+            "agent_name": "ExampleAgent",
+            "question": "example question",
+            "result": "example result",
+            "error": None,
+            "timestamp": ANY
+        }
     ]
+
     clear_scratchpad()
