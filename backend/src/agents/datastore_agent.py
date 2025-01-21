@@ -1,5 +1,8 @@
 import json
 import logging
+import os
+
+from dotenv import load_dotenv
 from src.llm.llm import LLM
 from src.utils.graph_db_utils import execute_query
 from src.prompts import PromptEngine
@@ -9,7 +12,7 @@ from src.utils.log_publisher import LogPrefix, publish_log_info
 from src.agents.agent import chat_agent
 from src.agents.base_chat_agent import BaseChatAgent
 from src.agents.tool import tool, Parameter, ToolActionSuccess, ToolActionFailure
-from src.utils.semantic_layer_builder import get_semantic_layer
+from src.utils.semantic_layer_builder import get_semantic_layer, semantic_layer_ready
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +24,7 @@ cache = {}
 async def generate_cypher_query_core(
     question_intent, operation, question_params, aggregation, sort_order, timeframe, llm: LLM, model
 ) -> ToolActionSuccess | ToolActionFailure:
+    await semantic_layer_ready.wait()
     details_to_create_cypher_query = engine.load_prompt(
         "details-to-create-cypher-query",
         question_intent=question_intent,
@@ -100,6 +104,19 @@ async def get_semantic_layer_cache(llm, model):
         return cache
     else:
         return cache
+
+async def initialize_semantic_layer():
+    try:
+        load_dotenv()
+        llm_name = os.getenv("DATASTORE_AGENT_LLM")
+        model_name = os.getenv("DATASTORE_AGENT_MODEL")
+
+        llm_instances = LLM.get_instances()
+        llm = llm_instances.get(llm_name)
+
+        await get_semantic_layer_cache(llm, model_name)
+    except Exception as e:
+        logger.exception(e)
 
 
 @chat_agent(
