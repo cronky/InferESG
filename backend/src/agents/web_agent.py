@@ -31,19 +31,23 @@ async def web_general_search_core(search_query, llm, model) -> ToolActionSuccess
     urls = search_result.get("urls", [])
     logger.info(f"URLs found: {urls}")
 
+    summaries = []
     for url in urls:
         content = await perform_scrape(url)
         if not content:
             continue  # Skip to the next URL if no content is found
-        logger.info(f"Content scraped for url: {url}")
-        logger.debug(f"Content scraped successfully: {content}")
         summary = await summarise_content(search_query, content, llm, model)
 
         if summary:
-            return ToolActionSuccess({"answer": summary, "citation_url": url})
+            summaries.append({"answer": summary, "citation_url": url})
+            if len(summaries) >= 2:
+                break
         else:
             logger.info(f"No relevant content found for url: {url}")
-    return ToolActionFailure("No relevant information found on the internet for the given query.")
+    if summaries:
+        return ToolActionSuccess(summaries)
+    else:
+        return ToolActionFailure("No relevant information found on the internet for the given query.")
 
 
 async def web_pdf_download_core(pdf_url, llm, model) -> ToolActionSuccess | ToolActionFailure:
@@ -133,7 +137,7 @@ async def perform_scrape(url: str) -> str:
     try:
         if not str(url).startswith("https"):
             return ""
-        scrape_result_json = await scrape_content(url)
+        scrape_result_json = await scrape_content(url, )
         scrape_result = json.loads(scrape_result_json)
         if scrape_result["status"] == "error":
             return ""

@@ -76,8 +76,7 @@ materiality_agent:
           "description": "This tool can answer questions about ESG Materiality for a specific named company or sector and explain materiality topics in detail. Topics include:  typical sector activities, value chain and business relationships..",
           "parameters":
             {
-              "question":
-                { "type": "string", "description": "The question to answer." },
+              "question": { "type": "string", "description": "The question to answer." },
               "subject":
                 {
                   "type": "string",
@@ -87,8 +86,29 @@ materiality_agent:
         },
       ],
   }
+file_agent:
+  &file_agent {
+    "name": "FileAgent",
+    "description": "This agent can retrieve information from files uploaded by the user. The user has uploaded the following files astra-zeneca-2024.pdf",
+    "tools":
+      [
+        {
+          "name": "read_file",
+          "description": "Extract parts of the content of a text or pdf file",
+          "parameters":
+            {
+              "question": { "type": "string", "description": "The question to answer." },
+              "filename":
+                {
+                  "type": "string",
+                  "description": "The name of the file to extract related information from",
+                },
+            },
+        },
+      ],
+  }
 list_of_agents_and_tools:
-  &list_of_agents_and_tools [*data_store_agent, *web_agent, *materiality_agent]
+  &list_of_agents_and_tools [*data_store_agent, *web_agent, *materiality_agent, *file_agent]
 
 providers:
   - id: openai:gpt-4o
@@ -98,7 +118,6 @@ providers:
         type: json_object
 
 prompts: file://promptfoo_test_runner.py:create_prompt
-
 tests:
   - description: "Test WHEN answering a question for current information on a company THEN the web agent is selected"
     vars:
@@ -253,3 +272,14 @@ tests:
     assert:
       - type: javascript
         value: JSON.parse(output).agent === "DatastoreAgent"
+
+  - description: "Test WHEN company file is uploaded and user has asked a question not about the report file THEN any agent is selected except for FileAgent"
+    vars:
+      user_prompt_template: "agent-selection-user-prompt"
+      user_prompt_args:
+        question: "What is AstraZeneca's current greenhouse gas emissions reporting methodology, specifically the primary calculation approach (location-based vs. market-based)"
+        list_of_agents_and_tools: *list_of_agents_and_tools
+      system_prompt_template: "agent-selection-system-prompt"
+    assert:
+      - type: javascript
+        value: JSON.parse(output).agent != "FileAgent"

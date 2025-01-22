@@ -1,7 +1,8 @@
+import asyncio
 import logging
 
-from src.agents.agent import ChatAgentSuccess
-from src.utils import get_scratchpad, update_scratchpad
+from src.agents.agent import ChatAgentSuccess, ChatAgentFailure
+from src.utils import update_scratchpad
 from src.router import select_tool_for_question
 from src.agents import get_generalist_agent
 
@@ -17,18 +18,21 @@ async def solve_questions(questions: list[str]) -> None:
     if len(questions) == 0:
         Exception(no_questions_response)
 
-    for question in questions:
-        try:
-            result = await solve_question(question, get_scratchpad())
-            update_scratchpad(result.agent_name, question, result.answer)
-        except Exception as error:
-            update_scratchpad(error=str(error))
+    tasks = [solve_question(question) for question in questions]
+
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    for i, result in enumerate(results):
+        if isinstance(result, ChatAgentSuccess | ChatAgentFailure):
+            update_scratchpad(result.agent_name, questions[i], result.answer)
+        else:
+            update_scratchpad(error=str(result))
 
 
-async def solve_question(question, scratchpad) -> ChatAgentSuccess:
-    unsuccessful_agents = []
+async def solve_question(question) -> ChatAgentSuccess:
+    chat_agent_failures = []
     for attempt in range(number_of_attempts):
-        agent, tool_name, parameters = await select_tool_for_question(question, scratchpad, unsuccessful_agents)
+        agent, tool_name, parameters = await select_tool_for_question(question, chat_agent_failures)
         if agent is None:
             break
 
@@ -37,8 +41,11 @@ async def solve_question(question, scratchpad) -> ChatAgentSuccess:
         if isinstance(answer, ChatAgentSuccess):
             return answer
         else:
-            if not answer.retry:
-                unsuccessful_agents.append(answer.agent_name)
+            chat_agent_failures.append(answer)
 
     logger.info("Defaulting to Generalist Agent")
-    return await get_generalist_agent().generalist_answer(question)
+    answer = await get_generalist_agent().generalist_answer(question)
+    if isinstance(answer, ChatAgentSuccess):
+        return answer
+    else:
+        raise Exception(f"Could not create answer for question: {question}")
