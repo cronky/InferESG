@@ -1,22 +1,62 @@
-# InferESG: Applying InferLLM/GPT to the ESG domain.
+# InferESG: AI-Augmented ESG Analysis
 
-InferESG's mission is to augment people working in the ESG (Environment, Societal and Governance) field. Helping them analyse ESG related documents and data, and find the important needles in massive haystacks of potential greenwashing. We want to build something that can:
+InferESG is an open-source solution that transforms how analysts interact with ESG (Environmental, Social, and Governance) data. Built upon the InferLLM framework, it helps combat greenwashing and validates ESG claims through AI-augmented analysis.
 
-🔗 Ingest data via CSV upload 
-💡 Have deep science based conversations - it will already infer your needs, make contextual recommendations and remember relevant details.  
+## 🎯 Mission
 
-We aim to be able to answer complex questions that require a deep understanding of someone to effectively answer, such as:
+InferESG's mission is to augment ESG analysts' capabilities through intelligent automation while maintaining human expertise and judgment in the loop. Rather than attempting to automate the entire analysis process, InferESG serves as an intelligent assistant that augments human expertise through three key capabilities:
 
-1. Does this document look like it contains Greenwashing?
-2. Which of the companies in this fund should I prioritise deep analysis on?
-3. I'm learning about ESG - can you help me understand this area better?
+### 🔍 Comprehensive Report Analysis
+- Thorough analysis of sustainability reports
+- Step-by-step materiality assessment
+- Examination of environmental targets, social initiatives, and governance structures
+- Identification of both strong performance areas and potential concerns
+
+### 💬 Interactive Investigation
+- Natural language query interface for ESG data exploration
+- Evidence-based responses through multi-agent framework
+- Deep dive capabilities into areas of interest or concern
+- Cross-referencing claims against external sources
+
+### 📊 Evidence-Based Analysis
+- Clear evidence trails for all conclusions
+- Transparent verification paths
+- Effective challenge processes
+- Support for manual verification
+
+## 🏗️ Technical Architecture
+
+InferESG employs a sophisticated multi-agent architecture:
+
+- Materiality Agent: Evaluates companies against established frameworks
+- Report Agent: Coordinates comprehensive document analysis
+- Web Agent: Validates claims against external sources
+- Intent Agent: Processes and routes natural language queries
+- Validator Agent: Improves response accuracy and completeness
+
+## 🚀 Key Features
+
+- Integration with key frameworks (TNFD, GRI)
+- Materiality assessment capabilities
+- Greenwashing detection
+- Interactive query system
+- Evidence trail generation
+- Multi-source validation
+
+## 📈 Validation & Testing
+
+The system has been validated through rigorous testing:
+- Testing across multiple industry sectors
+- F1 score metrics for accuracy measurement
+- Real-world validation with research industry sponsor
+- Cross-validation using multiple AI systems and manual exploratory testing
 
 ## InferESG Roadmap & Docs
 InferESG is based on InferGPT/LLM - more details below:
 
 Want more context about how it works, our roadmap and documentation? Check out the [wiki](https://github.com/WaitThatShouldntWork/InferGPT/wiki)
 
-For further reading on InferESG's components, see any of the following
+For further reading on LLMs's components, see any of the following
 
 - [Full system testing](test/README.md)
 - [Data persistence](data/README.md)
@@ -27,7 +67,11 @@ For further reading on InferESG's components, see any of the following
 - [Financial Bot](financialhealthcheckScottLogic/README.md)
 
 ## Contribute
-
+We welcome contributions from the community! Whether you're interested in:
+- Enhancing the analysis capabilities
+- Adding new materiality frameworks
+- Improving the agent architecture
+- Expanding validation capabilities
 See [the contribution guide](CONTRIBUTING.md) for further guidance. Note this guide is in progress!
 
 ## Getting Started
