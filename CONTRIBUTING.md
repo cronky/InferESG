@@ -3,6 +3,8 @@
 Welcome to InferESG! We appreciate your interest in contributing.
 Before you get started, please take a moment to review this guide.
 
+NOTE - this currently refers to the Parent Project InferGPT / LLM. We will update on the InferESG fork in the near future.
+
 ## Ways to Contribute
 
 See the [project Kanban board](https://github.com/users/WaitThatShouldntWork/projects/1) for issues that can be worked on. 
