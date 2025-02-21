@@ -58,15 +58,7 @@ InferESG is based on InferGPT/LLM - more details below:
 
 Want more context about how it works, our roadmap and documentation? Check out the [wiki](https://github.com/WaitThatShouldntWork/InferGPT/wiki)
 
-For further reading on LLMs's components, see any of the following
-
-- [Full system testing](test/README.md)
-- [Data persistence](data/README.md)
-- [Backend](backend/README.md)
-- [Frontend](frontend/README.md)
-- [Assets](assets/README.md)
-- [Testing](test/README.md)
-- [Financial Bot](financialhealthcheckScottLogic/README.md)
+For further reading on InferLLMs's components, see the [InferLLM Github](https://github.com/ScottLogic/InferLLM)
 
 ## Contribute
 We welcome contributions from the community! Whether you're interested in:
