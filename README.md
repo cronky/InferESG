@@ -2,7 +2,8 @@
 
 InferESG is an open-source solution that transforms how analysts interact with ESG (Environmental, Social, and Governance) data. Built upon the InferLLM framework, it helps combat greenwashing and validates ESG claims through AI-augmented analysis.
 
-Please Note: Alpha Solution Accelerator Status! This was developed as part of a research project and whilst it is easy to deploy (see below) and has shown promising results in testing it needs more work and integration to your data to be most effective. (Contributions to this project and it's parent project InferLLM welcome!)
+**Please Note:** Alpha Solution Accelerator Status! 
+This was initially developed as part of a FinTech Scotland Funded research project and whilst it is easy to deploy (see below) and has shown promising results in testing it needs more work (mostly on error handling and presentation) and integration to your data to be most effective. (Contributions to this project and it's parent project InferLLM welcome!)
 
 ## 🎯 Mission
 
@@ -57,6 +58,8 @@ The system has been validated through rigorous testing:
 InferESG is based on InferGPT/LLM - more details below:
 
 Want more context about how it works, our roadmap and documentation? Check out the [wiki](https://github.com/WaitThatShouldntWork/InferGPT/wiki)
+
+We are very keen to integration further use of the Knowledge Graph as we believe this will help manage a lot of the risks and improve it's capabilities.
 
 For further reading on InferLLMs's components, see the [InferLLM Github](https://github.com/ScottLogic/InferLLM)
 
