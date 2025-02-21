@@ -2,6 +2,8 @@
 
 InferESG is an open-source solution that transforms how analysts interact with ESG (Environmental, Social, and Governance) data. Built upon the InferLLM framework, it helps combat greenwashing and validates ESG claims through AI-augmented analysis.
 
+Please Note: Alpha Solution Accelerator Status! This was developed as part of a research project and whilst it is easy to deploy (see below) and has shown promising results in testing it needs more work and integration to your data to be most effective.
+
 ## 🎯 Mission
 
 InferESG's mission is to augment ESG analysts' capabilities through intelligent automation while maintaining human expertise and judgment in the loop. Rather than attempting to automate the entire analysis process, InferESG serves as an intelligent assistant that augments human expertise through three key capabilities:
