@@ -130,8 +130,18 @@ For ease of development, after running `docker compose build` you can run `docke
 - Type the phrase "healthcheck" into the frontend UI to test if everything is connected successfully
 
 ### Usage
+We've designed and tested the current initial workflow with an ESG analyst team. Primarily with the user journey of 
+- help me assess whether this is a company that we should consider adding to an ESG fund. What claims and potential greenwashing are present?
+- What's missing against material issues for the sector?
+- Help me (interactively) dig into the details of this company's sustainability claims.
+- Save me time wading through the noise to find the right signals to investigate
 
-Coming
+  **Process:**
+- To get started upload a Sustainability report PDF for an organistion. Be patient as a lot of processing is done initially (plan is to make this more efficient, async and notify the user when done)
+- Once the report has been analysed you can click a button to view it in the canvas or download it
+- You can then ask questions chat bot style. Behind the scenes InferESG works out whether to use data from the report, web searches, materiality documents, LLM generalist content or a mix
+- If you want to see how it's created its output to a question you can click a button and it will (at the time of writing) give you a JSON dump of what agent, queries and source URLs it has used - although the source URLs should also be included in the friendlier UI output
+- Suggested questions are provided based on the current conversation context
 
 ### LICENCE
 
