@@ -102,11 +102,10 @@ Configuration steps:
 ### Using Ollama with DeepSeek and Llama 3
 
 InferESG can run on locally hosted models through [Ollama](https://ollama.com/).
-Install Ollama and pull models suitable for an 8GB GPU:
+Install Ollama and pull models suitable for an 8GB GPU (or experiment with other models suitable for your setup):
 
 ```bash
 ollama pull llama3:8b
-ollama pull deepseek-coder:6b-instruct
 ```
 
 Set `OLLAMA_URL` in your `.env` (defaults to `http://localhost:11434`) and configure the desired `*_LLM` variables to `ollama`.
