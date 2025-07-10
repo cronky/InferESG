@@ -112,6 +112,8 @@ ollama pull deepseek-coder:6b-instruct
 Set `OLLAMA_URL` in your `.env` (defaults to `http://localhost:11434`) and configure the desired `*_LLM` variables to `ollama`.
 The `.env.open_source.example` file demonstrates a full open-source configuration. Mix commercial and open-source models by setting each `*_LLM` and `*_MODEL` variable individually.
 
+Ensure you install a recent version of `ollama` (0.1.33 or newer) so the Python dependencies resolve cleanly.
+
 ### Running the application
 
 There are a few ways to run the application:
