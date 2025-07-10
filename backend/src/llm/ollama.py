@@ -12,7 +12,11 @@ config = Config()
 
 class Ollama(LLM):
     def __init__(self):
-        self.client = AsyncClient(base_url=config.ollama_url or "http://localhost:11434")
+        # ollama.AsyncClient expects the server host via the ``host`` argument
+        # and internally forwards it as ``base_url`` to ``httpx.AsyncClient``.
+        # Passing ``base_url`` here leads to ``httpx`` receiving two values for
+        # that keyword, so use ``host`` instead.
+        self.client = AsyncClient(host=config.ollama_url or "http://localhost:11434")
 
     async def chat(self, model: str, system_prompt: str, user_prompt: str, return_json: bool = False) -> str:
         try:
