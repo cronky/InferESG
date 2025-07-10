@@ -98,8 +98,6 @@ Configuration steps:
 - Rename the copied file as `.env`.
 - Update the `.env` file with your wanted configuration following the guidance in the file.
 - For a configuration that uses open-source models with Ollama, copy `\.env.open_source.example` instead.
-  Ensure you install a recent version of `ollama` (0.1.33 or newer) so the Python
-  dependencies resolve cleanly.
 
 ### Using Ollama with DeepSeek and Llama 3
 
@@ -113,6 +111,8 @@ ollama pull deepseek-coder:6b-instruct
 
 Set `OLLAMA_URL` in your `.env` (defaults to `http://localhost:11434`) and configure the desired `*_LLM` variables to `ollama`.
 The `.env.open_source.example` file demonstrates a full open-source configuration. Mix commercial and open-source models by setting each `*_LLM` and `*_MODEL` variable individually.
+
+Ensure you install a recent version of `ollama` (0.1.33 or newer) so the Python dependencies resolve cleanly.
 
 ### Running the application
 
