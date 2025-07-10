@@ -97,6 +97,20 @@ Configuration steps:
 - Copy the `.env.example` file at the root of this project.
 - Rename the copied file as `.env`.
 - Update the `.env` file with your wanted configuration following the guidance in the file.
+- For a configuration that uses open-source models with Ollama, copy `\.env.open_source.example` instead.
+
+### Using Ollama with DeepSeek and Llama 3
+
+InferESG can run on locally hosted models through [Ollama](https://ollama.com/).
+Install Ollama and pull models suitable for an 8GB GPU:
+
+```bash
+ollama pull llama3:8b
+ollama pull deepseek-coder:6b-instruct
+```
+
+Set `OLLAMA_URL` in your `.env` (defaults to `http://localhost:11434`) and configure the desired `*_LLM` variables to `ollama`.
+The `.env.open_source.example` file demonstrates a full open-source configuration. Mix commercial and open-source models by setting each `*_LLM` and `*_MODEL` variable individually.
 
 ### Running the application
 

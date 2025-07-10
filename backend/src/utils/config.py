@@ -27,6 +27,7 @@ class Config(object):
         self.router_llm = None
         self.suggestions_llm = None
         self.dynamic_knowledge_graph_llm = None
+        self.ollama_url = None
         self.validator_agent_model = None
         self.intent_agent_model = None
         self.answer_agent_model = None
@@ -53,6 +54,7 @@ class Config(object):
             self.mistral_key = os.getenv("MISTRAL_KEY")
             self.mistral_model = os.getenv("MODEL")
             self.openai_key = os.getenv("OPENAI_KEY")
+            self.ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
             self.neo4j_uri = os.getenv("NEO4J_URI", default_neo4j_uri)
             self.neo4j_user = os.getenv("NEO4J_USERNAME")
             self.neo4j_password = os.getenv("NEO4J_PASSWORD")
