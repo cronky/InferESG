@@ -98,6 +98,8 @@ Configuration steps:
 - Rename the copied file as `.env`.
 - Update the `.env` file with your wanted configuration following the guidance in the file.
 - For a configuration that uses open-source models with Ollama, copy `\.env.open_source.example` instead.
+  Ensure you install a recent version of `ollama` (0.1.33 or newer) so the Python
+  dependencies resolve cleanly.
 
 ### Using Ollama with DeepSeek and Llama 3
 
